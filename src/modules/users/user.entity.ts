@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
+@Table({ tableName: 'USER' })
 export class User extends Model<User> {
   @Column({
     type: DataType.BIGINT,
