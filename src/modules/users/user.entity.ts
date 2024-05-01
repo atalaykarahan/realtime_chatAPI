@@ -55,7 +55,7 @@ export class User extends Model<User> {
 
   @Column({
     type: DataType.TIME,
-    allowNull: false,
+    allowNull: true,
   })
   user_library_visibility: boolean;
 

@@ -10,10 +10,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string) {
+  public async validateUser(username: string, pass: string) {
     // find if user exist with this email
-    const user = await this.userService.findOneByEmail(username);
+    const user = await this.userService.findOneByName(username);
     if (!user) {
+      console.log("buraya düşüyor demektir")
       return null;
     }
 
