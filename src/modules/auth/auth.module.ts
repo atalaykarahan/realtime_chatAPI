@@ -6,6 +6,7 @@ import { UsersModule } from '../users/users.module';
 import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { GoogleStrategy } from './google.strategy';
 
 @Module({
   imports: [PassportModule, UsersModule, 
@@ -14,7 +15,7 @@ import { JwtStrategy } from './jwt.strategy';
       signOptions: { expiresIn: process.env.TOKEN_EXPIRATION },
   })
   ],
-  providers: [AuthService, LocalStrategy,JwtStrategy],
+  providers: [GoogleStrategy, AuthService, LocalStrategy, JwtStrategy, ],
   controllers: [AuthController],
 })
 export class AuthModule {}
