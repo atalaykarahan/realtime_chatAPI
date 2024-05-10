@@ -19,18 +19,28 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   // api/v1/auth/login
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   @Get('login')
-  async login(@Req() req) {
+  async login() {
     return { msg: 'Google authentication' };
   }
 
   // api/v1/auth/redirect
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   @Get('redirect')
-  async redirect(@Req() req) {
-
-    return { msg: 'Google authentication' };
+  async redirect(@Req() req:any) {
+    const userObject = req.user;
+    //token degeri true ise user yeni kayit olucak demektir
+    if (userObject.token) {
+      return {
+        code: 200,
+        status: 'OK',
+        message: 'Token created for new user',
+        token: userObject.user,
+      };
+    } else {
+      return { message: 'google auth' };
+    }
   }
 
   // @UseGuards(AuthGuard('local'))
