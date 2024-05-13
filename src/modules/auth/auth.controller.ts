@@ -13,6 +13,8 @@ import { UserDto } from '../users/dto/user.dto';
 import { DoesUserExist } from 'src/core/guards/doesUserExist.guard';
 import { GoogleAuthGuard } from 'src/core/guards/googleAuth.guard';
 import { AppService } from 'src/app.service';
+import { TokenCheck } from 'src/core/guards/tokenCheck.guard';
+import { DoesUserNameExist } from 'src/core/guards/doesUserNameExist.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -41,6 +43,14 @@ export class AuthController {
     } else {
       return { message: 'google auth' };
     }
+  }
+
+  // api/v1/auth/signup | user come with token and userName
+  @UseGuards(TokenCheck, DoesUserNameExist)
+  @Post('signup')
+  async signUp(@Body() req: any){
+    console.log(req)
+    return { message: 'success' };
   }
 
   // @UseGuards(AuthGuard('local'))

@@ -76,7 +76,7 @@ export class AuthService {
 
   private async generateToken(user:UserDto) {
     //burda tokena payload olarak user verilmis
-    const token = await this.jwtService.signAsync(user);
+    const token = await this.jwtService.signAsync(user, {secret: process.env.JWTKEY ,expiresIn: process.env.TOKEN_EXPIRATION});
     return token;
   }
 

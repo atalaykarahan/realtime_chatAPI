@@ -1,0 +1,39 @@
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  ForbiddenException,
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { UsersService } from '../../modules/users/users.service';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+
+@Injectable()
+export class DoesUserNameExist implements CanActivate {
+  constructor(
+    private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const request = context.switchToHttp().getRequest();
+    return this.validateRequest(request);
+  }
+
+  async validateRequest(request: any) {
+    //check if user send a username
+    if (request.body.username) {
+      //search same username
+      const userNameExist = await this.userService.findOneByName(
+        request.body.username,
+      );
+      //if username exist than we send a error
+      if (userNameExist)
+        throw new ForbiddenException('This username already exist');
+      return true;
+    }
+    throw new ForbiddenException('Username does not exist');
+  }
+}
