@@ -27,22 +27,4 @@ export class User extends Model<User> {
     unique: false,
   })
   user_photo: string;
-
-  // @Column({
-  //   type: DataType.DATE,
-  //   allowNull: false,
-  // })
-  // createdAt: Date;
-
-  // @Column({
-  //   type: DataType.DATE,
-  //   allowNull: false,
-  // })
-  // updatedAt: Date;
-
-  // @Column({
-  //   type: DataType.DATE,
-  //   allowNull: true,
-  // })
-  // deletedAt: Date;
 }

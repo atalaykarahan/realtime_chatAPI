@@ -27,13 +27,4 @@ export class UserDto {
   readonly user_name: string;
   @IsOptional()
   readonly user_photo: string;
-  // @IsNotEmpty()
-  // @IsDate()
-  // readonly createdAt: Date;
-  // @IsNotEmpty()
-  // @IsDate()
-  // readonly updatedAt: Date;
-  // @IsOptional()
-  // @IsDate()
-  // readonly deletedAt: Date;
 }

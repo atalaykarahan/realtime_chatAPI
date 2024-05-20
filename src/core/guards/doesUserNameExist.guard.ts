@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { UsersService } from '../../modules/users/users.service';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 
+//if user select same username we return error
 @Injectable()
 export class DoesUserNameExist implements CanActivate {
   constructor(

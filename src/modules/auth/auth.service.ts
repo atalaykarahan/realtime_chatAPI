@@ -29,6 +29,12 @@ export class AuthService {
 
   }
 
+    public async signUp(user:UserDto) {
+    // const token = await this.generateToken(user);
+    const createdUser = await this.userService.create(user);
+    return createdUser;
+  }
+
   // public async validateUser(username: string, pass: string) {
   //   // find if user exist with this email
   //   const user = await this.userService.findOneByName(username);

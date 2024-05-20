@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { UsersService } from '../../modules/users/users.service';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 
+//if token is valid or expired we return error
 @Injectable()
 export class TokenCheck implements CanActivate {
   constructor(
