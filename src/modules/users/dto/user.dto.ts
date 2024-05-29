@@ -9,12 +9,6 @@ import {
   MinLength,
 } from 'class-validator';
 
-enum Authority {
-  GUEST = '1',
-  ADMIN = '2',
-  USER = '3',
-}
-
 export class UserDto {
   @IsNotEmpty()
   readonly user_id: string;
@@ -27,4 +21,6 @@ export class UserDto {
   readonly user_name: string;
   @IsOptional()
   readonly user_photo: string;
+  @IsOptional()
+  readonly user_role?: string;
 }

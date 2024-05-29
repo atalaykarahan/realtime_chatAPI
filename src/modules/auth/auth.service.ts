@@ -1,38 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../users/user.entity';
+import * as bcrypt from 'bcrypt';
 import { UserDto } from '../users/dto/user.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
-
   ) {}
 
-  public async validateUser(details: UserDto){
-    console.log(details);
-    console.log("validate user kısmına girdi")
-
+  //validate or login
+  public async validateUser(details: UserDto) {
+    //bu user id degerine sahip user var mi var ise o useri donuyoruz
     const user = await this.userService.findOneById(details.user_id);
-    if(!user){
+    if (!user) {
       // bu kisimda user yok ve oluşturulması icin jwt token dönülmeli
       const token = await this.generateToken(details);
-      return {user: token, token: true};
-    }else {
-      // bu kisimda ise user var direkt olarak session yaratılmalı veya şimdilik user dönülebilir
-      return {user: user, token: false};
+      return { user: token, token: true };
+    } else {
+      //user bulundu ve bulunan user donuluyor
+      const { updatedAt, createdAt, ...result } = user['dataValues'];
+      return { user: result, token: false };
     }
-
   }
 
-    public async signUp(user:UserDto) {
-    // const token = await this.generateToken(user);
+  //yeni user kayit olurken
+  public async signUp(user: UserDto) {
     const createdUser = await this.userService.create(user);
-    return createdUser;
+    const { updatedAt, createdAt, ...result } = createdUser['dataValues'];
+    return result;
   }
 
   // public async validateUser(username: string, pass: string) {
@@ -80,9 +78,12 @@ export class AuthService {
   //   // return { user: result, token };
   // }
 
-  private async generateToken(user:UserDto) {
+  private async generateToken(user: UserDto) {
     //burda tokena payload olarak user verilmis
-    const token = await this.jwtService.signAsync(user, {secret: process.env.JWTKEY ,expiresIn: process.env.TOKEN_EXPIRATION});
+    const token = await this.jwtService.signAsync(user, {
+      secret: process.env.JWTKEY,
+      expiresIn: process.env.TOKEN_EXPIRATION,
+    });
     return token;
   }
 

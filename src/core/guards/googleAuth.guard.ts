@@ -8,7 +8,8 @@ export class GoogleAuthGuard extends AuthGuard('google') {
     const activate = (await super.canActivate(context)) as boolean;
     const request = context.switchToHttp().getRequest();
     //eger kullanici kayitliysa session yaratma if degeri
-    if (!request.user.token) await super.logIn(request);
+    // if (!request.user.token) await super.logIn(request);
+    // if (!request.user.token) await request.logIn(request);
     return activate;
   }
 }

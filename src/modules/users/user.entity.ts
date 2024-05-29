@@ -27,4 +27,12 @@ export class User extends Model<User> {
     unique: false,
   })
   user_photo: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: false,
+    defaultValue: 'standart',
+  })
+  user_role: string;
 }

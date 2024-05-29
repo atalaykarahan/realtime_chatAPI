@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UsersService } from '../../modules/users/users.service';
@@ -32,7 +33,7 @@ export class DoesUserNameExist implements CanActivate {
       );
       //if username exist than we send a error
       if (userNameExist)
-        throw new ForbiddenException('This username already exist');
+        throw new ConflictException('This username already exists');
       return true;
     }
     throw new ForbiddenException('Username does not exist');

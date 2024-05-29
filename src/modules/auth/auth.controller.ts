@@ -8,6 +8,9 @@ import {
   Req,
   Headers,
   Session,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -39,62 +42,61 @@ export class AuthController {
   //#region GOOGLE CALLBACK
   @UseGuards(GoogleAuthGuard)
   @Get('redirect')
-  async redirect(@Req() req: any) {
-    const userObject = req.user;
-    //token degeri true ise user yeni kayit olucak demektir
-    if (userObject.token) {
+  async redirect(@Req() req: any, @Session() session: Record<string, any>) {
+    /* burda req.user kullanilmali
+     * yoksa tum req herseyiyle geliyor
+     * bunun icinde 2 adet obje var biri user digeri token */
+    const returnObject = req.user;
+    if (returnObject.token) {
       return {
         code: 200,
         status: 'OK',
         message: 'Token created for new user',
-        token: userObject.user,
+        token: returnObject.user,
       };
     } else {
-      //yeni kayıt olmayacak giris yapicak olan kullanici bu kisma ugrayacak
-      return { message: 'google auth' };
+      //kullanici basarili bir sekilde giris yapmis demektir
+      session.user = {
+        id: returnObject.user.user_id,
+        mail: returnObject.user.user_email,
+        role: returnObject.user.user_role,
+      };
+      return returnObject.user;
     }
   }
   //#endregion
 
   // api/v1/auth/signup | user come with token and userName
   //#region CREATE USERNAME AND SIGNUP
-  //bu guardı daha sonra ac
-  // @UseGuards(TokenCheck, DoesUserNameExist)
+  @UseGuards(TokenCheck, DoesUserNameExist)
   @Post('signup')
   async signUp(
     @Body() req: any,
     @Session() session: Record<string, unknown>,
     @Headers('Authorization') authHeader: string,
   ) {
-    console.log(req);
     const token = await this.jwtService.verifyAsync(authHeader);
-    console.log(token);
 
     const userObj = {
       user_id: token.user_id,
       user_email: token.user_email,
       user_name: req.username,
-      user_photo: token.user_photo
-    }
+      user_photo: token.user_photo,
+    };
     const createdUser = await this.authService.signUp(userObj);
 
-    console.log(createdUser)
+    if (!createdUser)
+      throw new HttpException(
+        'User could not be created',
+        HttpStatus.BAD_REQUEST,
+      );
 
-    // const myTest = {
-    //   user_id: "431214515123",
-    //   user_authority_id: 2,
-    // }
-    // session.user = myTest;
-    // session.user = await this.userService.login(request);
-    // session["alper"] = myTest;
-    // const deneme = session["alper"];
-    // user_id = session[req.session.user_id = 431214515123]
-    // console.log("herhalde değeri var",deneme)
-
-
-    //bu kisma bakarsin istersen baska bir sey dönersin
-    // return req.session;
-    return {message: "ok"}
+    session.user = {
+      id: createdUser.user_id,
+      mail: createdUser.user_email,
+      role: createdUser.user_role,
+    };
+    return createdUser;
   }
   //#endregion
 
