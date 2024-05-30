@@ -1,26 +1,23 @@
 import {
   Body,
   Controller,
-  Post,
-  UseGuards,
-  Request,
   Get,
-  Req,
   Headers,
-  Session,
-  ForbiddenException,
   HttpException,
   HttpStatus,
+  Post,
+  Req,
+  Res,
+  Session,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthGuard } from '@nestjs/passport';
-import { UserDto } from '../users/dto/user.dto';
-import { DoesUserExist } from 'src/core/guards/doesUserExist.guard';
-import { GoogleAuthGuard } from 'src/core/guards/googleAuth.guard';
-import { AppService } from 'src/app.service';
-import { TokenCheck } from 'src/core/guards/tokenCheck.guard';
-import { DoesUserNameExist } from 'src/core/guards/doesUserNameExist.guard';
 import { JwtService } from '@nestjs/jwt';
+import { DoesUserNameExist } from 'src/core/guards/doesUserNameExist.guard';
+import { Response } from 'express';
+import { GoogleAuthGuard } from 'src/core/guards/googleAuth.guard';
+import { TokenCheck } from 'src/core/guards/tokenCheck.guard';
+import { AuthService } from './auth.service';
+import { ValidSession } from 'src/core/guards/validSession.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -42,18 +39,19 @@ export class AuthController {
   //#region GOOGLE CALLBACK
   @UseGuards(GoogleAuthGuard)
   @Get('redirect')
-  async redirect(@Req() req: any, @Session() session: Record<string, any>) {
+  async redirect(
+    @Req() req: any,
+    @Res() res: Response,
+    @Session() session: Record<string, any>,
+  ) {
     /* burda req.user kullanilmali
      * yoksa tum req herseyiyle geliyor
      * bunun icinde 2 adet obje var biri user digeri token */
     const returnObject = req.user;
+    //eger kullanici kayitli degil ise token donuyourz
     if (returnObject.token) {
-      return {
-        code: 200,
-        status: 'OK',
-        message: 'Token created for new user',
-        token: returnObject.user,
-      };
+      const redirectUrl = `${process.env.FRONT_URL}/createname?token=${returnObject.user}`;
+      res.redirect(redirectUrl);
     } else {
       //kullanici basarili bir sekilde giris yapmis demektir
       session.user = {
@@ -61,7 +59,7 @@ export class AuthController {
         mail: returnObject.user.user_email,
         role: returnObject.user.user_role,
       };
-      return returnObject.user;
+      res.redirect(`${process.env.FRONT_URL}/chat`);
     }
   }
   //#endregion
@@ -72,6 +70,7 @@ export class AuthController {
   @Post('signup')
   async signUp(
     @Body() req: any,
+    @Res() res: Response,
     @Session() session: Record<string, unknown>,
     @Headers('Authorization') authHeader: string,
   ) {
@@ -96,19 +95,16 @@ export class AuthController {
       mail: createdUser.user_email,
       role: createdUser.user_role,
     };
-    return createdUser;
+
+    res.redirect(`${process.env.FRONT_URL}/chat`);
   }
   //#endregion
 
-  // @UseGuards(AuthGuard('local'))
-  // @Post('login')
-  // async login(@Request() req) {
-  //     return await this.authService.login(req.user);
-  // }
-
-  // @UseGuards(DoesUserExist)
-  // @Post('signup')
-  // async signUp(@Body() user: UserDto) {
-  //     return await this.authService.create(user);
-  // }
+  //#region chech if user has a valid session
+  @UseGuards(ValidSession)
+  @Get()
+  async getAuthenticatedUser(@Session() session: Record<string, unknown>) {
+    return session.user;
+  }
+  //#endregion
 }

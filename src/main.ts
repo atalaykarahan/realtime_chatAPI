@@ -17,11 +17,11 @@ async function bootstrap() {
   // const RedisStore = connectRedis(session); 
   // const RedisStore = require("connect-redis").default;
   // const redisClient = new Redis()
-  const configService = app.get(ConfigService);
+  // const configService = app.get(ConfigService);
 
   const RedisStore = require("connect-redis").default;
-  const redisHost: string = configService.get('REDIS_HOST');
-  const redisPort: number = configService.get('REDIS_PORT');
+  // const redisHost: string = configService.get('REDIS_HOST');
+  // const redisPort: number = configService.get('REDIS_PORT');
   const redisClient = new Redis({
     host: "127.0.0.1",
     port: 6379,
@@ -38,6 +38,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidateInputPipe());
 
+ 
+  app.enableCors({
+    origin: ['http://localhost:3000', 'https://example.com'], // İzin verilen kökenler (frontend adresleri)
+    credentials: true, // Credential (örneğin cookie) desteği
+  });
 
   app.use(
     session({
