@@ -29,7 +29,8 @@ export class AuthService {
   //yeni user kayit olurken
   public async signUp(user: UserDto) {
     const createdUser = await this.userService.create(user);
-    const { updatedAt, createdAt, ...result } = createdUser['dataValues'];
+    const { updatedAt, createdAt, deletedAt, ...result } =
+      createdUser['dataValues'];
     return result;
   }
 

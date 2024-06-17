@@ -12,10 +12,7 @@ import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 //if user select same username we return error
 @Injectable()
 export class DoesUserNameExist implements CanActivate {
-  constructor(
-    private readonly userService: UsersService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly userService: UsersService) {}
 
   canActivate(
     context: ExecutionContext,
@@ -26,6 +23,7 @@ export class DoesUserNameExist implements CanActivate {
 
   async validateRequest(request: any) {
     //check if user send a username
+
     if (request.body.username) {
       //search same username
       const userNameExist = await this.userService.findOneByName(

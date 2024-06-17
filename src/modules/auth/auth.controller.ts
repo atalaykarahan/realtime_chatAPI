@@ -48,7 +48,7 @@ export class AuthController {
      * yoksa tum req herseyiyle geliyor
      * bunun icinde 2 adet obje var biri user digeri token */
     const returnObject = req.user;
-    //eger kullanici kayitli degil ise token donuyourz
+    //eger kullanici kayitli degil ise token donuyoruz
     if (returnObject.token) {
       const redirectUrl = `${process.env.FRONT_URL}/createname?token=${returnObject.user}`;
       res.redirect(redirectUrl);
@@ -96,7 +96,8 @@ export class AuthController {
       role: createdUser.user_role,
     };
 
-    res.redirect(`${process.env.FRONT_URL}/chat`);
+    return res.status(HttpStatus.CREATED).json(createdUser);
+    // res.redirect(`${process.env.FRONT_URL}/chat`);
   }
   //#endregion
 
