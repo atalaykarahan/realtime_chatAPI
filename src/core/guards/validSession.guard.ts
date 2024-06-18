@@ -7,6 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { UsersService } from '../../modules/users/users.service';
 
+// control if user has a valid session
 @Injectable()
 export class ValidSession implements CanActivate {
   constructor(private readonly userService: UsersService) {}

@@ -12,12 +12,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { DoesUserNameExist } from 'src/core/guards/doesUserNameExist.guard';
 import { Response } from 'express';
+import { DoesUserNameExist } from 'src/core/guards/doesUserNameExist.guard';
 import { GoogleAuthGuard } from 'src/core/guards/googleAuth.guard';
 import { TokenCheck } from 'src/core/guards/tokenCheck.guard';
-import { AuthService } from './auth.service';
 import { ValidSession } from 'src/core/guards/validSession.guard';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
