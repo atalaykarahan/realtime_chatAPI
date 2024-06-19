@@ -55,11 +55,13 @@ export class AuthController {
     } else {
       //kullanici basarili bir sekilde giris yapmis demektir
       session.user = {
-        id: returnObject.user.user_id,
-        mail: returnObject.user.user_email,
-        role: returnObject.user.user_role,
+        id: returnObject.user_id,
+        name: returnObject.user_name,
+        mail: returnObject.user_email,
+        role: returnObject.user_role,
+        photo: returnObject.user_photo,
       };
-      res.redirect(`${process.env.FRONT_URL}/chat`);
+      res.redirect(`${process.env.FRONT_URL}/login`);
     }
   }
   //#endregion
@@ -92,15 +94,17 @@ export class AuthController {
 
     session.user = {
       id: createdUser.user_id,
+      name: createdUser.user_name,
       mail: createdUser.user_email,
       role: createdUser.user_role,
+      photo: createdUser.user_photo,
     };
 
     return res.status(HttpStatus.CREATED).json(createdUser);
-    // res.redirect(`${process.env.FRONT_URL}/chat`);
   }
   //#endregion
 
+  // api/v1/auth | user come with token and userName
   //#region chech if user has a valid session
   @UseGuards(ValidSession)
   @Get()
