@@ -5,6 +5,7 @@ import {
   Headers,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
   Post,
   Req,
   Res,
@@ -55,11 +56,11 @@ export class AuthController {
     } else {
       //kullanici basarili bir sekilde giris yapmis demektir
       session.user = {
-        id: returnObject.user_id,
-        name: returnObject.user_name,
-        mail: returnObject.user_email,
-        role: returnObject.user_role,
-        photo: returnObject.user_photo,
+        id: returnObject.user.user_id,
+        name: returnObject.user.user_name,
+        mail: returnObject.user.user_email,
+        role: returnObject.user.user_role,
+        photo: returnObject.user.user_photo,
       };
       res.redirect(`${process.env.FRONT_URL}/login`);
     }
@@ -71,7 +72,7 @@ export class AuthController {
   @UseGuards(TokenCheck, DoesUserNameExist)
   @Post('signup')
   async signUp(
-    @Body() req: any,
+    @Body() body: any,
     @Res() res: Response,
     @Session() session: Record<string, unknown>,
     @Headers('Authorization') authHeader: string,
@@ -81,7 +82,7 @@ export class AuthController {
     const userObj = {
       user_id: token.user_id,
       user_email: token.user_email,
-      user_name: req.username,
+      user_name: body.username,
       user_photo: token.user_photo,
     };
     const createdUser = await this.authService.signUp(userObj);
@@ -112,4 +113,18 @@ export class AuthController {
     return session.user;
   }
   //#endregion
+
+  // api/v1/auth/logout
+  //#region LOGOUT
+  @UseGuards(ValidSession)
+  @Post('logout')
+  async logOut(@Req() req: any, @Res() res: Response) {
+    req.session.destroy((error: any) => {
+      if (error != undefined) {
+        throw new InternalServerErrorException('Something went wrong!');
+      } else {
+        return res.sendStatus(HttpStatus.OK);
+      }
+    });
+  }
 }
