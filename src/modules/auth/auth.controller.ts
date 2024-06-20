@@ -123,7 +123,8 @@ export class AuthController {
       if (error != undefined) {
         throw new InternalServerErrorException('Something went wrong!');
       } else {
-        res.clearCookie('connect.sid', { path: '/' });
+        //kullanicidaki cookie'yi siler
+        res.clearCookie(process.env.COOKIE_NAME, { path: '/' });
         return res.sendStatus(HttpStatus.OK);
       }
     });
