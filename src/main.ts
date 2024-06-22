@@ -35,7 +35,7 @@ async function bootstrap() {
     origin: [
       `http://localhost:${process.env.CLIENT_PORT}`,
       'https://example.com',
-    ], // İzin verilen kökenler (frontend adresleri)
+    ], // İzin verilen kökenler (frontend adresl eri)
     credentials: true, // Credential (örneğin cookie) desteği
   });
 

@@ -25,9 +25,29 @@ export class ChatGateway
   }
 
   handleConnection(client: Socket) {
-    throw new Error('Method not implemented.');
+
+    const sockets = this.io.sockets;
+
+
+    // this.logger.debug(
+    //     `Socket connected with userID: ${client.userID}, pollID: ${client.pollID}, and name: "${client.name}"`,
+    //   );
+
+    this.logger.log(`WS Client with id: ${client.id} connected!`);
+    this.logger.debug(`Number of connected sockets: ${sockets.size}`);
+
+
+    this.io.emit('merhaba', client.id)
+
   }
   handleDisconnect(client: Socket) {
-    throw new Error('Method not implemented.');
+    const sockets = this.io.sockets;
+
+
+    this.logger.log(`Disconnected socket id: ${client.id}`);
+    this.logger.debug(`Number of connected sockets: ${sockets.size}`);
+    // this.logger.debug(
+    //   `Total clients connected to room '${roomName}': ${clientCount}`,
+    // );
   }
 }
