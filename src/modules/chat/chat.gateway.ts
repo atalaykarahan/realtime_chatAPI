@@ -1,13 +1,16 @@
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import {
   OnGatewayInit,
   WebSocketGateway,
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketServer,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { ChatService } from './chat.service';
-import { Namespace, Socket, } from 'socket.io';
+import { Namespace, Socket } from 'socket.io';
+import { ValidSession } from 'src/core/guards/validSession.guard';
+
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -18,16 +21,14 @@ export class ChatGateway
   private readonly logger = new Logger(ChatGateway.name);
   constructor(private readonly chatService: ChatService) {}
 
-    @WebSocketServer() io: Namespace;
+  @WebSocketServer() io: Namespace;
 
   afterInit(): void {
     this.logger.log('Websocket Gateway initialized.');
   }
 
   handleConnection(client: Socket) {
-
     const sockets = this.io.sockets;
-
 
     // this.logger.debug(
     //     `Socket connected with userID: ${client.userID}, pollID: ${client.pollID}, and name: "${client.name}"`,
@@ -36,13 +37,10 @@ export class ChatGateway
     this.logger.log(`WS Client with id: ${client.id} connected!`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
 
-
-    this.io.emit('merhaba', client.id)
-
+    this.io.emit('merhaba', client.id);
   }
   handleDisconnect(client: Socket) {
     const sockets = this.io.sockets;
-
 
     this.logger.log(`Disconnected socket id: ${client.id}`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
