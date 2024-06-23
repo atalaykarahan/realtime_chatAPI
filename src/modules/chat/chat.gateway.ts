@@ -25,6 +25,7 @@ export class ChatGateway
 
   afterInit(): void {
     this.logger.log('Websocket Gateway initialized.');
+    this.io.use
   }
 
   handleConnection(client: Socket) {
