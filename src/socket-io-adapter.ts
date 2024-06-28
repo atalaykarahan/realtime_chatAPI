@@ -22,7 +22,7 @@ export class SocketIOAdapter extends IoAdapter {
         `http://localhost:${clientPort}`,
         new RegExp(`/^http:\/\/192\.168\.1\.([1-9]|[1-9]\d):${clientPort}$/`),
       ],
-      credentials:true,
+      credentials: true,
     };
 
     this.logger.log('Configuring SocketIO server with custom CORS options', {
@@ -45,26 +45,21 @@ export class SocketIOAdapter extends IoAdapter {
 
     return server;
   }
-
-  
 }
 
 const createSessionMiddleware =
-    (userService: UsersService, logger: Logger) =>
-    (socket: any, next) => {
-      console.log("session bilgileri burda", socket.request.session)
-      // console.log("handshake kısmı", socket.handshake.session)
+  (userService: UsersService, logger: Logger) => (socket: any, next) => {
+    // console.log('session bilgileri burda', socket.request.session);
+    // console.log("handshake kısmı", socket.handshake.session)
 
-      const userSession = socket.request.session.user;
-      console.log("usersession bu olmalı", userSession)
+    const userSession = socket.request.session.user;
+    // console.log("usersession bu olmalı", userSession)
 
-      logger.debug(`Validating user session before connection: ${userSession}`);
+    logger.debug(`Validating user session before connection: ${userSession}`);
 
-      if (!userSession) next(new Error('FORBIDDEN'));
+    if (!userSession) next(new Error('FORBIDDEN'));
+    socket.user_id = userSession.id;
+    // socket.user_id = user.
 
-      const user = userService.findOneById(userSession.id);
-
-      if (!user) next(new Error('FORBIDDEN'));
-
-      next();
-    };
+    next();
+  };

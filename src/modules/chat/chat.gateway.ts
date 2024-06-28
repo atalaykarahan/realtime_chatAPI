@@ -28,17 +28,17 @@ export class ChatGateway
     this.io.use
   }
 
-  handleConnection(client: Socket) {
+  handleConnection(client: any) {
     const sockets = this.io.sockets;
 
-    // this.logger.debug(
-    //     `Socket connected with userID: ${client.userID}, pollID: ${client.pollID}, and name: "${client.name}"`,
-    //   );
+    this.logger.debug(
+        `Socket connected with userID: ${client.user_id}, and name: "${client.name}"`,
+      );
 
     this.logger.log(`WS Client with id: ${client.id} connected!`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
 
-    this.io.emit('merhaba', client.id);
+    this.io.emit('merhaba', "abuzer ");
   }
   handleDisconnect(client: Socket) {
     const sockets = this.io.sockets;

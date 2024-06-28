@@ -1,6 +1,6 @@
+import { Logger } from '@nestjs/common';
 import * as session from 'express-session';
 import { default as Redis } from 'ioredis';
-import { Logger } from '@nestjs/common';
 
 const RedisStore = require('connect-redis').default;
 const redisClient = new Redis({
@@ -30,7 +30,7 @@ export const sessionMiddleware = session({
   rolling: true,
 });
 
-//socket io icin gerekli olan middleware 
-export const wrap = (expressMiddlaware) => (socket, next) =>{
-    expressMiddlaware(socket.request, {}, next);
-}
+//socket io icin gerekli olan middleware
+export const wrap = (expressMiddlaware) => (socket, next) => {
+  expressMiddlaware(socket.request, {}, next);
+};
