@@ -1,81 +1,34 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidateInputPipe } from './core/pipes/validate.pipe';
-import * as session from 'express-session';
-import * as createRedisStore from 'connect-redis';
-// import connectRedis from 'connect-redis';
-import { default as Redis } from 'ioredis';
-import { ConfigService } from '@nestjs/config';
-import { createClient } from 'redis';
-import { Logger } from '@nestjs/common';
-import passport from 'passport';
+import { sessionMiddleware } from './modules/server/server.controller';
+import { SocketIOAdapter } from './socket-io-adapter';
 
 const port = process.env.PORT;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // const RedisStore = connectRedis(session);
-  // const RedisStore = require("connect-redis").default;
-  // const redisClient = new Redis()
-  // const configService = app.get(ConfigService);
-
-  const RedisStore = require('connect-redis').default;
-  // const redisHost: string = configService.get('REDIS_HOST');
-  // const redisPort: number = configService.get('REDIS_PORT');
-  const redisClient = new Redis({
-    host: '127.0.0.1',
-    port: 6379,
-  });
-
-  redisClient.on('error', (err) =>
-    Logger.error('Could not establish a connection with redis. ' + err),
-  );
-  redisClient.on('connect', () =>
-    Logger.verbose('Connected to redis successfully'),
-  );
+  const configService = app.get(ConfigService);
 
   console.log('starting on port:', port);
+  // socket.io haric geriye kalan tum endpointlere prefix ekler
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidateInputPipe());
 
+  //cors ayarlari
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://example.com'], // İzin verilen kökenler (frontend adresleri)
+    origin: [
+      `http://localhost:${process.env.CLIENT_PORT}`,
+      `http://localhost:${process.env.CLIENT_PORT + 1}`,
+    ], // İzin verilen kökenler (frontend adresl eri)
     credentials: true, // Credential (örneğin cookie) desteği
   });
 
-  app.use(
-    session({
-      store: new RedisStore({ client: redisClient as any }),
-      secret: 'asdfasdgasdfas',
-      resave: false,
-      saveUninitialized: false,
-      name: process.env.COOKIE_NAME,
-      cookie: {
-        sameSite: 'strict',
-        domain: 'localhost',
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000 * 99999,
-      },
-      rolling: true,
-    }),
-  );
+  app.useWebSocketAdapter(new SocketIOAdapter(app, configService));
 
-  // app.use(passport.initialize());
-  // app.use(passport.session());
+  app.use(sessionMiddleware);
 
-  // app.use(
-  //   session({
-  //     store: new RedisStore({ client: redisClient, url: "redis://atalay:test@localhost:63799443" }),
-  //     saveUninitialized: false,
-  //     secret: 'testdenemeee',
-  //     resave: false,
-  //     cookie: {
-  //       sameSite: true,
-  //       httpOnly: false,
-  //       maxAge: 60000,
-  //     },
-  //   }),
-  // );
   await app.listen(port);
 }
 bootstrap();

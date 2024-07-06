@@ -6,6 +6,9 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { GoogleStrategy } from './modules/auth/google.strategy';
+import { ChatModule } from './modules/chat/chat.module';
+
+
 
 @Module({
   imports: [
@@ -13,6 +16,7 @@ import { GoogleStrategy } from './modules/auth/google.strategy';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy],
