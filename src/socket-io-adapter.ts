@@ -20,6 +20,7 @@ export class SocketIOAdapter extends IoAdapter {
     const cors = {
       origin: [
         `http://localhost:${clientPort}`,
+        `${process.env.FRONT_URL}`,
         new RegExp(`/^http:\/\/192\.168\.1\.([1-9]|[1-9]\d):${clientPort}$/`),
       ],
       credentials: true,
@@ -58,8 +59,11 @@ const createSessionMiddleware =
     logger.debug(`Validating user session before connection: ${userSession}`);
 
     if (!userSession) next(new Error('FORBIDDEN'));
-    socket.user_id = userSession.id;
-    // socket.user_id = user.
 
+    socket.user_id = userSession.id;
+    socket.user_name = userSession.name;
+    socket.user_mail = userSession.mail;
+    socket.user_photo = userSession.photo;
+    socket.user_role = userSession.role;
     next();
   };
