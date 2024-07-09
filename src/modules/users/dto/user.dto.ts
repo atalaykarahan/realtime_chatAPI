@@ -1,13 +1,4 @@
-import {
-  IsDate,
-  IsEmail,
-  IsEmpty,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class UserDto {
   @IsNotEmpty()

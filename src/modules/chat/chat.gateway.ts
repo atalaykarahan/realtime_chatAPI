@@ -1,15 +1,15 @@
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import {
-  OnGatewayInit,
-  WebSocketGateway,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  WebSocketServer,
+  OnGatewayInit,
   SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { ChatService } from './chat.service';
 import { Namespace, Socket } from 'socket.io';
-import { ValidSession } from 'src/core/guards/validSession.guard';
+import { MessageDto } from '../messages/dto/message.dto';
+import { MessagesService } from '../messages/messages.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -19,7 +19,7 @@ export class ChatGateway
 {
   private readonly logger = new Logger(ChatGateway.name);
   private userSockets = new Map<string, string>();
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly messageService: MessagesService) {}
 
   @WebSocketServer() io: Namespace;
 
@@ -41,15 +41,7 @@ export class ChatGateway
     this.logger.log(`WS Client with id: ${client.id} connected!`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
 
-   
-
-    this.userSockets.set(userId, client.id); 
-
-    //bu kod mesajı gönderiyor
-    // this.io.emit(
-    //   '114950733215735919150',
-    //   'merhaba atalay bu mesaj back-end tarafından sana gelmekte',
-    // );
+    this.userSockets.set(userId, client.id);
   }
 
   handleDisconnect(client: Socket) {
@@ -63,25 +55,44 @@ export class ChatGateway
   }
 
   @SubscribeMessage('sendMessage')
-  handleMessage(client: any, payload: { DestionationUserId: string; message: string }) {
+  async handleMessage(
+    client: any,
+    payload: { DestionationUserId: string; message: string },
+  ) {
     const { DestionationUserId, message } = payload;
     //socket id user_id ile aynı sey degil
     const destinationSocketId = this.userSockets.get(DestionationUserId);
 
-    console.log("tetiklendi mesaj bir şekilde gönderilmiş olmalı--------------", payload)
-
     if (destinationSocketId) {
+      try {
+        //insert kodu buraya gelecek
+        const messageObj: MessageDto = {
+          message_content: message,
+          message_sender_id: client.user_id,
+          message_receiver_id: DestionationUserId,
+          message_read_status: 'unread',
+        };
 
-     //insert kodu buraya gelecek
+        const createdMessage = this.messageService.create(messageObj);
 
-      this.io.to(destinationSocketId).emit("chat", {
-        sender_id: client.user_id,
-        message: message,
-      });
+        if (createdMessage) {
+          this.io.to(destinationSocketId).emit('chat', {
+            sender_id: client.user_id,
+            message: message,
+          });
+
+          console.log(
+            'Mesaj başarıyla gönderildi ve veritabanına eklendi.',
+            createdMessage,
+          );
+        } else {
+          console.error('Mesaj veritabanına eklenemedi.');
+        }
+      } catch (error) {
+        console.error('Mesaj veritabanına eklenirken bir hata oluştu:', error);
+      }
     } else {
       this.logger.warn(`User with id: ${DestionationUserId} is not connected.`);
-
-
     }
   }
 }

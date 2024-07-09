@@ -1,10 +1,11 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 import { READ_STATUS, ReadStatus } from 'src/enum';
 
 @Table({ tableName: 'MESSAGE' })
 export class Message extends Model<Message> {
   @Column({
     type: DataType.BIGINT,
+    autoIncrement: true,
     primaryKey: true,
   })
   message_id: string;
@@ -30,7 +31,6 @@ export class Message extends Model<Message> {
   @Column({
     type: DataType.ENUM(...READ_STATUS),
     allowNull: false,
-    defaultValue: 'unread',
   })
   message_read_status: ReadStatus;
 }
