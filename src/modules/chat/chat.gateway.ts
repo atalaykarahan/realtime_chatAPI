@@ -54,9 +54,9 @@ export class ChatGateway
 
   handleDisconnect(client: Socket) {
     const sockets = this.io.sockets;
-
-    // this.logger.log(`Disconnected socket id: ${client.id}`);
-    // this.logger.debug(`Number of connected sockets: ${sockets.size}`);
+    this.logger.log(`Disconnected socket id: ${client.id}`);
+    this.logger.debug(`Number of connected sockets: ${sockets.size}`);
+    //bu alttaki kısma sonradan bak
     // this.logger.debug(
     //   `Total clients connected to room '${roomName}': ${clientCount}`,
     // );
