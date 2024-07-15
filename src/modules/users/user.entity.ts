@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { Message } from '../messages/message.entity';
 
 @Table({ tableName: 'USER' })
 export class User extends Model<User> {
@@ -35,4 +36,11 @@ export class User extends Model<User> {
     defaultValue: 'standart',
   })
   user_role: string;
+
+
+  @HasMany(() => Message, 'message_sender_id')
+  sentMessages: Message[];
+
+  @HasMany(() => Message, 'message_receiver_id')
+  receivedMessages: Message[];
 }
