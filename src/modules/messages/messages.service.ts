@@ -83,8 +83,7 @@ export class MessagesService {
 
     messages.forEach((msg) => {
       const otherUser = msg.sender == null ? msg.receiver : msg.sender;
-      if(otherUser){
-
+      if (otherUser) {
         if (!conversationMap.has(otherUser.user_email)) {
           conversationMap.set(otherUser.user_email, {
             other_user_email: otherUser.user_email,
@@ -107,7 +106,18 @@ export class MessagesService {
       }
     });
 
-    
+    let sortBy = 'asc';
+    // Mesajları message_id'ye göre sırala
+    conversationMap.forEach((conversation) => {
+      conversation.messages.sort((a, b) => {
+        if (sortBy === 'asc') {
+          return a.message_id - b.message_id;
+        } else {
+          return b.message_id - a.message_id;
+        }
+      });
+    });
+
     const result = Array.from(conversationMap.values());
     return result;
   }

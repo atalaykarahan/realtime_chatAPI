@@ -16,7 +16,7 @@ export class MessageController {
 
   //bu endpoint henüz korunmuyor daha sonra koru bunu
   //api/v1/message/conversation_private
-  @Post('conversation_private')
+  @Post('conversation/private')
   async privateConversation(
     @Body() body: { sender_id: string; receiver_id: string },
     @Res() res: Response,
