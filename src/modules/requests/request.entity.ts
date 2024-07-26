@@ -5,12 +5,13 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { ReqeustStatus } from '../../enum';
+import { RequestStatus } from '../../enum';
 import { User } from '../users/user.entity';
 
 @Table({ tableName: 'REQUEST' })
 @Table({
   updatedAt: false,
+  paranoid: true,
 })
 export class Request extends Model<Request> {
   @Column({
@@ -35,17 +36,17 @@ export class Request extends Model<Request> {
 
   @Column({
     type: DataType.ENUM,
-    values: Object.keys(ReqeustStatus),
+    values: Object.keys(RequestStatus),
     allowNull: false,
-    defaultValue: ReqeustStatus.pending,
+    defaultValue: RequestStatus.pending,
     get() {
-      return this.getDataValue('requst_status') as ReqeustStatus;
+      return this.getDataValue('request_status') as RequestStatus;
     },
-    set(value: ReqeustStatus) {
-      this.setDataValue('requst_status', value);
+    set(value: RequestStatus) {
+      this.setDataValue('request_status', value);
     },
   })
-  request_status: ReqeustStatus;
+  request_status: RequestStatus;
 
   @BelongsTo(() => User, { foreignKey: 'sender_mail', targetKey: 'user_email' })
   sender: User;

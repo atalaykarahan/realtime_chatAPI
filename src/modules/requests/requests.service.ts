@@ -3,6 +3,7 @@ import { REQUEST_REPOSITORY } from '../../core/constants';
 import { Request } from './request.entity';
 import { RequestDto } from './dto/request.dto';
 import { User } from '../users/user.entity';
+import { RequestStatus } from '../../enum';
 
 @Injectable()
 export class RequestsService {
@@ -33,5 +34,18 @@ export class RequestsService {
       user_name: request.sender?.user_name,
       user_photo: request.sender?.user_photo,
     }));
+  }
+
+  async acceptAndDelete(
+    sender_mail: string,
+    receiver_mail: string,
+  ): Promise<boolean> {
+    const request = await this.requestRepository.findOne({
+      where: { sender_mail: sender_mail, receiver_mail: receiver_mail },
+    });
+    request.request_status = RequestStatus.accepted;
+    await request.save();
+    await request.destroy();
+    return true;
   }
 }

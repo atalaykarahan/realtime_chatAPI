@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Patch,
   Post,
   Res,
   Session,
@@ -18,7 +19,7 @@ export class RequestController {
   constructor(private requestService: RequestsService) {}
 
   // api/v1/request
-  //#region SEND FRIEND REQUEST
+  //#region SEND FRIEND REQUEST | post
   @UseGuards(ValidSession)
   @Post()
   async sendRequest(
@@ -42,7 +43,7 @@ export class RequestController {
 
   //#endregion
 
-  // api/v1/request
+  // api/v1/request | get
   //#region GET FRIEND REQUEST
   @UseGuards(ValidSession)
   @Get()
@@ -54,13 +55,39 @@ export class RequestController {
       session.user.mail,
     );
 
-    console.log('döenen mesjalar burda olmalı', requests);
-
     if (!requests)
       throw new HttpException('Request not found', HttpStatus.NO_CONTENT);
 
     return res.status(HttpStatus.OK).json(requests);
   }
+  //#endregion
 
+  // api/v1/request/accept | patch
+  //#region ACCEPT FRIENDSHIP REQUEST
+  @UseGuards(ValidSession)
+  @Patch('accept')
+  async patchRequest(
+    @Body() body: { sender_mail: string },
+    @Res() res: Response,
+    @Session() session: Record<string, any>,
+  ) {
+    if (!body.sender_mail)
+      throw new HttpException(
+        'sender mail does not exists',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const accept = await this.requestService.acceptAndDelete(
+      body.sender_mail,
+      session.user.mail,
+    );
+    if (!accept)
+      throw new HttpException(
+        'Request could not be accept',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return res.sendStatus(HttpStatus.OK);
+  }
   //#endregion
 }

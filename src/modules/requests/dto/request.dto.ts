@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { ReqeustStatus } from '../../../enum';
+import { RequestStatus } from '../../../enum';
 
 export class RequestDto {
   @IsOptional()
@@ -13,7 +13,7 @@ export class RequestDto {
   @IsNotEmpty()
   readonly receiver_mail: string;
 
-  @IsEnum(ReqeustStatus)
+  @IsEnum(RequestStatus)
   @IsOptional()
-  message_read_status?: ReqeustStatus = ReqeustStatus.pending;
+  message_read_status?: RequestStatus = RequestStatus.pending;
 }
