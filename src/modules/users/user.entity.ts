@@ -33,10 +33,9 @@ export class User extends Model<User> {
     type: DataType.STRING,
     allowNull: false,
     unique: false,
-    defaultValue: 'standart',
+    defaultValue: 'standard',
   })
   user_role: string;
-
 
   @HasMany(() => Message, 'message_sender_id')
   sentMessages: Message[];

@@ -37,12 +37,9 @@ export class Message extends Model<Message> {
   })
   message_read_status: ReadStatus;
 
-
   @BelongsTo(() => User, 'message_sender_id')
   sender: User;
 
   @BelongsTo(() => User, 'message_receiver_id')
   receiver: User;
-
-
 }

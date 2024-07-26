@@ -19,10 +19,10 @@ export class UsersService {
     });
   }
 
-  async findOneByName(user_name:string):Promise<User> {
+  async findOneByName(user_name: string): Promise<User> {
     return await this.userRepository.findOne<User>({
-      where: {user_name}
-    })
+      where: { user_name },
+    });
   }
 
   async findOneById(id: string): Promise<User> {

@@ -21,6 +21,7 @@ export class AuthService {
       return { user: token, token: true };
     } else {
       //user bulundu ve bulunan user donuluyor
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { updatedAt, createdAt, ...result } = user['dataValues'];
       return { user: result, token: false };
     }

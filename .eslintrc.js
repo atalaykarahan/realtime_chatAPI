@@ -17,7 +17,8 @@ module.exports = {
   },
   overrides: [
     {
-        env: {
+      files: ['*.js'],
+      env: {
             node: true
         },
     }

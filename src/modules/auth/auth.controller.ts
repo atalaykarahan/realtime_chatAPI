@@ -34,6 +34,7 @@ export class AuthController {
   async login() {
     return { msg: 'Google authentication' };
   }
+
   //#endregion
 
   // api/v1/auth/redirect
@@ -65,6 +66,7 @@ export class AuthController {
       res.redirect(`${process.env.FRONT_URL}/login`);
     }
   }
+
   //#endregion
 
   // api/v1/auth/signup | user come with token and userName
@@ -103,6 +105,7 @@ export class AuthController {
 
     return res.status(HttpStatus.CREATED).json(createdUser);
   }
+
   //#endregion
 
   // api/v1/auth | user come with token and userName
@@ -112,6 +115,7 @@ export class AuthController {
   async getAuthenticatedUser(@Session() session: Record<string, unknown>) {
     return session.user;
   }
+
   //#endregion
 
   // api/v1/auth/logout
