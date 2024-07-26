@@ -1,5 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { ReqeustStatus } from '../../enum';
+import { User } from '../users/user.entity';
 
 @Table({ tableName: 'REQUEST' })
 @Table({
@@ -39,4 +46,7 @@ export class Request extends Model<Request> {
     },
   })
   request_status: ReqeustStatus;
+
+  @BelongsTo(() => User, { foreignKey: 'sender_mail', targetKey: 'user_email' })
+  sender: User;
 }

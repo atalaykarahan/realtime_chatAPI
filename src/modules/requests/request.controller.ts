@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -16,7 +17,7 @@ import { Response } from 'express';
 export class RequestController {
   constructor(private requestService: RequestsService) {}
 
-  // api/v1/auth/login
+  // api/v1/request
   //#region SEND FRIEND REQUEST
   @UseGuards(ValidSession)
   @Post()
@@ -38,5 +39,28 @@ export class RequestController {
 
     return res.sendStatus(HttpStatus.CREATED);
   }
+
+  //#endregion
+
+  // api/v1/request
+  //#region GET FRIEND REQUEST
+  @UseGuards(ValidSession)
+  @Get()
+  async getRequest(
+    @Res() res: Response,
+    @Session() session: Record<string, any>,
+  ) {
+    const requests = await this.requestService.getComingByEmail(
+      session.user.mail,
+    );
+
+    console.log('döenen mesjalar burda olmalı', requests);
+
+    if (!requests)
+      throw new HttpException('Request not found', HttpStatus.NO_CONTENT);
+
+    return res.status(HttpStatus.OK).json(requests);
+  }
+
   //#endregion
 }
