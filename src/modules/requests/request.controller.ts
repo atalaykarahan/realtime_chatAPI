@@ -14,6 +14,7 @@ import { RequestsService } from './requests.service';
 import { ValidSession } from '../../core/guards/validSession.guard';
 import { Response } from 'express';
 import { RequestStatus } from '../../enum';
+import { RequestDto } from './dto/request.dto';
 
 @Controller('request')
 export class RequestController {
@@ -68,7 +69,7 @@ export class RequestController {
   //#region UPDATE FRIENDSHIP REQUEST
   @UseGuards(ValidSession)
   @Patch()
-  async patchAcceptRequest(
+  async patchUpdateRequest(
     @Body() body: { sender_mail: string; status: RequestStatus },
     @Res() res: Response,
     @Session() session: Record<string, any>,
@@ -79,14 +80,16 @@ export class RequestController {
         HttpStatus.BAD_REQUEST,
       );
 
-    const accept = await this.requestService.updateFriendshipRequest(
-      body.sender_mail,
-      session.user.mail,
-      body.status,
-    );
-    if (!accept)
+    const props: RequestDto = {
+      sender_mail: body.sender_mail,
+      receiver_mail: session.user.mail,
+      request_status: body.status,
+    };
+    const updateRequest =
+      await this.requestService.updateFriendshipRequest(props);
+    if (!updateRequest)
       throw new HttpException(
-        'Request could not be accept',
+        'Request could not be updated',
         HttpStatus.BAD_REQUEST,
       );
 

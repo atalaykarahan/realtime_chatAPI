@@ -7,30 +7,25 @@ import { FriendStatus } from '../../enum';
 })
 export class Friend extends Model<Friend> {
   @Column({
-    type: DataType.BIGINT,
+    type: DataType.STRING,
     primaryKey: true,
     allowNull: false,
   })
   user_mail: string;
 
   @Column({
-    type: DataType.BIGINT,
+    type: DataType.STRING,
     primaryKey: true,
     allowNull: false,
   })
   user_mail2: string;
 
   @Column({
-    type: DataType.ENUM,
+    type: DataType.STRING,
     values: Object.keys(FriendStatus),
     allowNull: false,
     defaultValue: FriendStatus.friend,
-    get() {
-      return this.getDataValue('friend_status') as FriendStatus;
-    },
-    set(value: FriendStatus) {
-      this.setDataValue('friend_status', value);
-    },
+    field: 'friend_status',
   })
   friend_status: FriendStatus;
 }

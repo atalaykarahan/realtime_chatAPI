@@ -2,8 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FRIEND_REPOSITORY, SEQUELIZE } from '../../core/constants';
 import { Friend } from './friend.entity';
 import { FriendDto } from './dto/friend.dto';
-import sequelize, { Transaction } from 'sequelize';
+import sequelize, { Op, Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { FriendStatus } from '../../enum';
 
 @Injectable()
 export class FriendsService {
@@ -14,6 +15,7 @@ export class FriendsService {
     private readonly sequelize: Sequelize,
   ) {}
 
+  //#region CREATE FRIENDSHIP
   async create(request: FriendDto, transaction: Transaction): Promise<boolean> {
     try {
       await this.friendRepository.create<Friend>(request, { transaction });
@@ -23,6 +25,9 @@ export class FriendsService {
     }
   }
 
+  //#endregion
+
+  //#region GET ALL FRIENDS BY USER EMAIL
   async getFriends(user_mail: string): Promise<any> {
     const friends = await this.sequelize.query(
       `
@@ -42,10 +47,12 @@ export class FriendsService {
                 END)
        WHERE 
          (f.user_mail = :userEmail OR f.user_mail2 = :userEmail)
-         AND u.user_email != :userEmail`,
+         AND u.user_email != :userEmail
+         AND f.friend_status = :friendStatus`,
       {
         replacements: {
           userEmail: user_mail,
+          friendStatus: FriendStatus.friend,
         },
         type: sequelize.QueryTypes.SELECT,
       },
@@ -53,4 +60,46 @@ export class FriendsService {
 
     return friends;
   }
+
+  //#endregion
+
+  //#region BLOCK FRIEND BY EMAIL
+  async blockFriend(user_mail: string, friend_mail: string): Promise<boolean> {
+    const friendRow = await this.friendRepository.findOne({
+      where: {
+        [Op.or]: [
+          { user_mail: user_mail, user_mail2: friend_mail },
+          { user_mail: friend_mail, user_mail2: user_mail },
+        ],
+      },
+    });
+
+    if (!friendRow) {
+      return false;
+    }
+
+    const isUser1 = friendRow.user_mail === user_mail;
+    switch (friendRow.friend_status) {
+      case FriendStatus.friend:
+        friendRow.friend_status = isUser1
+          ? FriendStatus.block_first_second
+          : FriendStatus.block_second_first;
+        break;
+      case FriendStatus.block_first_second:
+        if (!isUser1) {
+          friendRow.friend_status = FriendStatus.block_both;
+        }
+        break;
+      case FriendStatus.block_second_first:
+        if (isUser1) {
+          friendRow.friend_status = FriendStatus.block_both;
+        }
+        break;
+      // Eğer ikisi de birbirini blokladıysa, friend_status değişmeyecek.
+    }
+    await friendRow.save();
+    return true;
+  }
+
+  //#endregion
 }

@@ -15,5 +15,5 @@ export class RequestDto {
 
   @IsEnum(RequestStatus)
   @IsOptional()
-  readonly message_read_status?: RequestStatus = RequestStatus.pending;
+  readonly request_status?: RequestStatus = RequestStatus.pending;
 }

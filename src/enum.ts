@@ -9,5 +9,7 @@ export enum RequestStatus {
 
 export enum FriendStatus {
   friend = 'friend',
-  blocked = 'blocked',
+  block_both = 'block_both',
+  block_first_second = 'block_first_second',
+  block_second_first = 'block_second_first',
 }

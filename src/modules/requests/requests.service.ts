@@ -18,11 +18,15 @@ export class RequestsService {
     private readonly sequelize: Sequelize,
   ) {}
 
+  //#region CREATE REQEUST
   async create(request: RequestDto): Promise<boolean> {
     await this.requestRepository.create<Request>(request);
     return true;
   }
 
+  //#endregion
+
+  //#region GET REQUESTS BY EMAIL
   async getComingByEmail(user_email: string): Promise<any> {
     const requests = await this.requestRepository.findAll({
       where: { receiver_mail: user_email },
@@ -42,42 +46,40 @@ export class RequestsService {
     }));
   }
 
+  //#endregion
+
+  //#region UPDATE REQUEST STATUS AND DELETE
   async updateStatusAndDelete(
-    status: RequestStatus,
-    sender_mail: string,
-    receiver_mail: string,
+    props: RequestDto,
     transaction: Transaction,
   ): Promise<boolean> {
     const request = await this.requestRepository.findOne({
-      where: { sender_mail: sender_mail, receiver_mail: receiver_mail },
+      where: {
+        sender_mail: props.sender_mail,
+        receiver_mail: props.receiver_mail,
+      },
       transaction,
     });
-    request.request_status = status;
+    request.request_status = props.request_status;
     await request.save({ transaction });
     await request.destroy({ transaction });
     return true;
   }
 
-  async updateFriendshipRequest(
-    sender_mail: string,
-    receiver_mail: string,
-    status: RequestStatus,
-  ): Promise<boolean> {
+  //#endregion
+
+  //#region UPDATE FRIENDSHIP REQUEST
+  async updateFriendshipRequest(props: RequestDto): Promise<boolean> {
     const transaction = await this.sequelize.transaction();
 
     try {
-      await this.updateStatusAndDelete(
-        status,
-        sender_mail,
-        receiver_mail,
-        transaction,
-      );
+      await this.updateStatusAndDelete(props, transaction);
 
-      if (status == RequestStatus.accepted)
+      if (props.request_status == RequestStatus.accepted)
         await this.friendService.create(
           {
-            user_mail: sender_mail,
-            user_mail2: receiver_mail,
+            user_mail: props.sender_mail,
+            user_mail2: props.receiver_mail,
           },
           transaction,
         );
@@ -90,4 +92,6 @@ export class RequestsService {
       return false;
     }
   }
+
+  //#endregion
 }
