@@ -13,6 +13,7 @@ import {
 import { RequestsService } from './requests.service';
 import { ValidSession } from '../../core/guards/validSession.guard';
 import { Response } from 'express';
+import { RequestStatus } from '../../enum';
 
 @Controller('request')
 export class RequestController {
@@ -63,24 +64,25 @@ export class RequestController {
 
   //#endregion
 
-  // api/v1/request/accept | patch
-  //#region ACCEPT FRIENDSHIP REQUEST
+  // api/v1/request | patch
+  //#region UPDATE FRIENDSHIP REQUEST
   @UseGuards(ValidSession)
-  @Patch('accept')
-  async patchRequest(
-    @Body() body: { sender_mail: string },
+  @Patch()
+  async patchAcceptRequest(
+    @Body() body: { sender_mail: string; status: RequestStatus },
     @Res() res: Response,
     @Session() session: Record<string, any>,
   ) {
-    if (!body.sender_mail)
+    if (!body.sender_mail || !body.status)
       throw new HttpException(
-        'sender mail does not exists',
+        'sender mail or status does not exists',
         HttpStatus.BAD_REQUEST,
       );
 
-    const accept = await this.requestService.acceptFriendship(
+    const accept = await this.requestService.updateFriendshipRequest(
       body.sender_mail,
       session.user.mail,
+      body.status,
     );
     if (!accept)
       throw new HttpException(

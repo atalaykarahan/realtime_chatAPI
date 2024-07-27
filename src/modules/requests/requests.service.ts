@@ -58,27 +58,29 @@ export class RequestsService {
     return true;
   }
 
-  async acceptFriendship(
+  async updateFriendshipRequest(
     sender_mail: string,
     receiver_mail: string,
+    status: RequestStatus,
   ): Promise<boolean> {
     const transaction = await this.sequelize.transaction();
 
     try {
       await this.updateStatusAndDelete(
-        RequestStatus.accepted,
+        status,
         sender_mail,
         receiver_mail,
         transaction,
       );
 
-      await this.friendService.create(
-        {
-          user_mail: sender_mail,
-          user_mail2: receiver_mail,
-        },
-        transaction,
-      );
+      if (status == RequestStatus.accepted)
+        await this.friendService.create(
+          {
+            user_mail: sender_mail,
+            user_mail2: receiver_mail,
+          },
+          transaction,
+        );
 
       await transaction.commit();
       return true;
