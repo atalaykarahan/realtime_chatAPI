@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -61,4 +62,29 @@ export class FriendController {
   }
 
   //#endregion
+
+  // api/v1/friend | delete
+  @UseGuards(ValidSession)
+  @Delete()
+  async removeFriend(
+    @Res() res: Response,
+    @Session() session: Record<string, any>,
+    @Body() body: { friend_mail: string },
+  ) {
+    if (!body.friend_mail)
+      throw new HttpException('Friend mail is missing', HttpStatus.BAD_REQUEST);
+
+    const removeFriend = await this.friendService.delete({
+      user_mail: session.user.mail,
+      user_mail2: body.friend_mail,
+    });
+
+    if (!removeFriend)
+      throw new HttpException(
+        'Something went wrong, Friendship does not exists',
+        HttpStatus.NO_CONTENT,
+      );
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
+  }
 }

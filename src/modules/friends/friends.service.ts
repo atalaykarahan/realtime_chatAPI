@@ -22,6 +22,7 @@ export class FriendsService {
       return true;
     } catch (e) {
       console.error('create friend kısmında hata transaction ', e);
+      return false;
     }
   }
 
@@ -48,7 +49,8 @@ export class FriendsService {
        WHERE 
          (f.user_mail = :userEmail OR f.user_mail2 = :userEmail)
          AND u.user_email != :userEmail
-         AND f.friend_status = :friendStatus`,
+         AND f.friend_status = :friendStatus
+         AND f."deletedAt" IS NULL`,
       {
         replacements: {
           userEmail: user_mail,
@@ -65,13 +67,9 @@ export class FriendsService {
 
   //#region BLOCK FRIEND BY EMAIL
   async blockFriend(user_mail: string, friend_mail: string): Promise<boolean> {
-    const friendRow = await this.friendRepository.findOne({
-      where: {
-        [Op.or]: [
-          { user_mail: user_mail, user_mail2: friend_mail },
-          { user_mail: friend_mail, user_mail2: user_mail },
-        ],
-      },
+    const friendRow = await this.getFriendByMail({
+      user_mail: user_mail,
+      user_mail2: friend_mail,
     });
 
     if (!friendRow) {
@@ -98,6 +96,36 @@ export class FriendsService {
       // Eğer ikisi de birbirini blokladıysa, friend_status değişmeyecek.
     }
     await friendRow.save();
+    return true;
+  }
+
+  //#endregion
+
+  //region GET FRIEND BY MAIL
+  async getFriendByMail(props: FriendDto): Promise<Friend> {
+    const friendRow = await this.friendRepository.findOne({
+      where: {
+        [Op.or]: [
+          { user_mail: props.user_mail, user_mail2: props.user_mail2 },
+          { user_mail: props.user_mail2, user_mail2: props.user_mail },
+        ],
+      },
+    });
+
+    return friendRow;
+  }
+
+  //endregion
+
+  //#region DELETE FRIENDSHIP
+  async delete(props: FriendDto): Promise<boolean> {
+    const friendRow = await this.getFriendByMail(props);
+
+    if (!friendRow) {
+      return false;
+    }
+
+    await friendRow.destroy();
     return true;
   }
 
