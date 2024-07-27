@@ -6,3 +6,8 @@ export enum RequestStatus {
   rejected = 'rejected',
   accepted = 'accepted',
 }
+
+export enum FriendStatus {
+  friend = 'friend',
+  blocked = 'blocked',
+}

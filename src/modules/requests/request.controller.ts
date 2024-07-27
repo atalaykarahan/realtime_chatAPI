@@ -60,6 +60,7 @@ export class RequestController {
 
     return res.status(HttpStatus.OK).json(requests);
   }
+
   //#endregion
 
   // api/v1/request/accept | patch
@@ -77,7 +78,7 @@ export class RequestController {
         HttpStatus.BAD_REQUEST,
       );
 
-    const accept = await this.requestService.acceptAndDelete(
+    const accept = await this.requestService.acceptFriendship(
       body.sender_mail,
       session.user.mail,
     );
@@ -89,5 +90,6 @@ export class RequestController {
 
     return res.sendStatus(HttpStatus.OK);
   }
+
   //#endregion
 }

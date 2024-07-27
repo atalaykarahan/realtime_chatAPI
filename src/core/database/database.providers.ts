@@ -4,6 +4,7 @@ import { User } from '../../modules/users/user.entity';
 import { DEVELOPMENT, PRODUCTION, SEQUELIZE, TEST } from '../constants';
 import { databaseConfig } from './database.config';
 import { Request } from '../../modules/requests/request.entity';
+import { Friend } from '../../modules/friends/friend.entity';
 
 export const databaseProviders = [
   {
@@ -24,7 +25,7 @@ export const databaseProviders = [
           config = databaseConfig.development;
       }
       const sequelize = new Sequelize(config);
-      sequelize.addModels([User, Message, Request]);
+      sequelize.addModels([User, Message, Request, Friend]);
       await sequelize.sync();
       return sequelize;
     },
