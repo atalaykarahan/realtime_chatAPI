@@ -10,6 +10,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { RequestsModule } from './modules/requests/requests.module';
 import { FriendsModule } from './modules/friends/friends.module';
+import { RoomsModule } from './modules/rooms/rooms.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { FriendsModule } from './modules/friends/friends.module';
     ChatModule,
     RequestsModule,
     FriendsModule,
+    RoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy],
