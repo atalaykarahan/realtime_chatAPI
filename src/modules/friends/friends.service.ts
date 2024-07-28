@@ -5,7 +5,6 @@ import { FriendDto } from './dto/friend.dto';
 import sequelize, { Op, Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { FriendStatus } from '../../enum';
-import { User } from '../users/user.entity';
 
 @Injectable()
 export class FriendsService {
