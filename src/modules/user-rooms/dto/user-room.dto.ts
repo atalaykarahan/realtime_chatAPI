@@ -5,5 +5,5 @@ export class UserRoomDto {
   readonly user_id: string;
 
   @IsNotEmpty()
-  readonly room_id?: string;
+  readonly room_id: string;
 }

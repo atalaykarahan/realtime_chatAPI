@@ -6,6 +6,7 @@ import { databaseConfig } from './database.config';
 import { Request } from '../../modules/requests/request.entity';
 import { Friend } from '../../modules/friends/friend.entity';
 import { Room } from '../../modules/rooms/room.entity';
+import { UserRoom } from '../../modules/user-rooms/user-room.entity';
 
 export const databaseProviders = [
   {
@@ -26,7 +27,7 @@ export const databaseProviders = [
           config = databaseConfig.development;
       }
       const sequelize = new Sequelize(config);
-      sequelize.addModels([User, Message, Request, Friend, Room]);
+      sequelize.addModels([User, Message, Request, Friend, Room, UserRoom]);
       await sequelize.sync();
       return sequelize;
     },

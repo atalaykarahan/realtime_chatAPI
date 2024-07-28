@@ -11,6 +11,7 @@ import { MessagesModule } from './modules/messages/messages.module';
 import { RequestsModule } from './modules/requests/requests.module';
 import { FriendsModule } from './modules/friends/friends.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
+import { UserRoomsModule } from './modules/user-rooms/user-rooms.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { RoomsModule } from './modules/rooms/rooms.module';
     RequestsModule,
     FriendsModule,
     RoomsModule,
+    UserRoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy],

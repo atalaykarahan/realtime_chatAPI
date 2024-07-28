@@ -6,6 +6,7 @@ export class Room extends Model<Room> {
     type: DataType.UUID,
     primaryKey: true,
     allowNull: true,
+    autoIncrement: true,
   })
   room_id: string;
 

@@ -49,9 +49,6 @@ export class ChatGateway
     this.logger.log(`Disconnected socket id: ${client.id}`);
     this.logger.debug(`Number of connected sockets: ${sockets.size}`);
 
-
-
-
     //bu alttaki kısma sonradan bak
     // this.logger.debug(
     //   `Total clients connected to room '${roomName}': ${clientCount}`,
@@ -77,21 +74,21 @@ export class ChatGateway
           message_read_status: 'unread',
         };
 
-        const createdMessage = this.messageService.create(messageObj);
+        // const createdMessage = this.messageService.create(messageObj);
 
-        if (createdMessage) {
-          this.io.to(destinationSocketId).emit('chat', {
-            sender_id: client.user_id,
-            message: message,
-          });
-
-          console.log(
-            'Mesaj başarıyla gönderildi ve veritabanına eklendi.',
-            createdMessage,
-          );
-        } else {
-          console.error('Mesaj veritabanına eklenemedi.');
-        }
+        // if (createdMessage) {
+        //   this.io.to(destinationSocketId).emit('chat', {
+        //     sender_id: client.user_id,
+        //     message: message,
+        //   });
+        //
+        //   console.log(
+        //     'Mesaj başarıyla gönderildi ve veritabanına eklendi.',
+        //     createdMessage,
+        //   );
+        // } else {
+        //   console.error('Mesaj veritabanına eklenemedi.');
+        // }
       } catch (error) {
         console.error('Mesaj veritabanına eklenirken bir hata oluştu:', error);
       }

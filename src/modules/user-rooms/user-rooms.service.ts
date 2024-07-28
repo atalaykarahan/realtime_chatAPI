@@ -1,20 +1,27 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ROOM_REPOSITORY, SEQUELIZE } from '../../core/constants';
-import { Sequelize } from 'sequelize-typescript';
+import { USER_ROOM_REPOSITORY } from '../../core/constants';
 import { UserRoomDto } from './dto/user-room.dto';
 import { UserRoom } from './user-room.entity';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class UserRoomsService {
   constructor(
-    @Inject(ROOM_REPOSITORY)
+    @Inject(USER_ROOM_REPOSITORY)
     private readonly userRoomRepository: typeof UserRoom,
-    @Inject(SEQUELIZE)
-    private readonly sequelize: Sequelize,
   ) {}
 
-  async create(props: UserRoomDto): Promise<UserRoom> {
-    const userRoom = await this.userRoomRepository.create<UserRoom>(props);
-    return userRoom;
+  async create(
+    props: UserRoomDto,
+    transaction: Transaction,
+  ): Promise<UserRoom> {
+    try {
+      const userRoom = await this.userRoomRepository.create<UserRoom>(props, {
+        transaction,
+      });
+      return userRoom;
+    } catch (e) {
+      console.error('create user_room kısmında hata oluştu', e);
+    }
   }
 }

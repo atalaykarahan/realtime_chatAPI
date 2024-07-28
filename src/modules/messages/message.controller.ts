@@ -16,26 +16,26 @@ export class MessageController {
 
   //bu endpoint henüz korunmuyor daha sonra koru bunu
   //api/v1/message/conversation_private
-  @Post('conversation/private')
-  async privateConversation(
-    @Body() body: { sender_id: string; receiver_id: string },
-    @Res() res: Response,
-  ) {
-    const oldConversations = await this.messageService.getPrivateConversation(
-      body.sender_id,
-      body.receiver_id,
-    );
-    return res.status(HttpStatus.OK).json(oldConversations);
-  }
+  // @Post('conversation/private')
+  // async privateConversation(
+  //   @Body() body: { sender_id: string; receiver_id: string },
+  //   @Res() res: Response,
+  // ) {
+  //   const oldConversations = await this.messageService.getPrivateConversation(
+  //     body.sender_id,
+  //     body.receiver_id,
+  //   );
+  //   return res.status(HttpStatus.OK).json(oldConversations);
+  // }
 
   //api/v1/message/conversation
-  @Get('conversation')
-  async Conversation(
-    @Session() session: Record<string, any>,
-    @Res() res: Response,
-  ) {
-    const user_id = session.user.id;
-    const oldConversations = await this.messageService.getConversation(user_id);
-    return res.status(HttpStatus.OK).json(oldConversations);
-  }
+  // @Get('conversation')
+  // async Conversation(
+  //   @Session() session: Record<string, any>,
+  //   @Res() res: Response,
+  // ) {
+  //   const user_id = session.user.id;
+  //   const oldConversations = await this.messageService.getConversation(user_id);
+  //   return res.status(HttpStatus.OK).json(oldConversations);
+  // }
 }
