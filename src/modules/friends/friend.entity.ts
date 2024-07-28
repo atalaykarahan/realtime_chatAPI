@@ -1,5 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { FriendStatus } from '../../enum';
+import { User } from '../users/user.entity';
 
 @Table({ tableName: 'FRIEND' })
 @Table({
@@ -28,4 +35,24 @@ export class Friend extends Model<Friend> {
     field: 'friend_status',
   })
   friend_status: FriendStatus;
+
+  // @BelongsTo(() => User, 'user_mail')
+  // user1: User;
+  //
+  // @BelongsTo(() => User, 'user_mail2')
+  // user2: User;
+
+  @BelongsTo(() => User, {
+    foreignKey: 'user_mail',
+    targetKey: 'user_email',
+    as: 'user1',
+  })
+  user1: User;
+
+  @BelongsTo(() => User, {
+    foreignKey: 'user_mail2',
+    targetKey: 'user_email',
+    as: 'user2',
+  })
+  user2: User;
 }

@@ -5,6 +5,7 @@ import { FriendDto } from './dto/friend.dto';
 import sequelize, { Op, Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { FriendStatus } from '../../enum';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class FriendsService {
@@ -130,4 +131,39 @@ export class FriendsService {
   }
 
   //#endregion
+
+  //region GET BLOCKED FRIENDS BY EMAIL
+  async getAllBlockedFriends(user_mail: string): Promise<any> {
+    //burda kaldın mola verdin.!!!
+    const blockedUsers = await this.sequelize.query(
+      ` SELECT u.user_email as blocked_mail, u.user_name, u.user_photo FROM "FRIEND" f
+    INNER JOIN "USER" u ON u.user_email = f.user_mail2
+    WHERE f.user_mail = :userEmail
+    AND (
+      (f.friend_status = 'block_both')
+    OR
+    (f.friend_status = 'block_first_second')
+  )
+
+    UNION
+
+    SELECT u.user_email as blocked_mail, u.user_name, u.user_photo FROM "FRIEND" f
+    INNER JOIN "USER" u ON u.user_email = f.user_mail
+    WHERE f.user_mail2 = :userEmail
+    AND (
+      (f.friend_status = 'block_both')
+    OR
+    (f.friend_status = 'block_second_first')
+  )`,
+      {
+        replacements: {
+          userEmail: user_mail,
+        },
+        type: sequelize.QueryTypes.SELECT,
+      },
+    );
+    return blockedUsers;
+  }
+
+  //endregion
 }

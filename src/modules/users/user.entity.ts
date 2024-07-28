@@ -1,5 +1,6 @@
 import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
 import { Message } from '../messages/message.entity';
+import { Friend } from '../friends/friend.entity';
 
 @Table({ tableName: 'USER' })
 export class User extends Model<User> {
@@ -42,4 +43,16 @@ export class User extends Model<User> {
 
   @HasMany(() => Message, 'message_receiver_id')
   receivedMessages: Message[];
+
+  // @HasMany(() => Friend, 'user_mail')
+  // friends1: Friend[];
+  //
+  // @HasMany(() => Friend, 'user_mail2')
+  // friends2: Friend[];
+
+  @HasMany(() => Friend, { foreignKey: 'user_mail', as: 'friendsAsUser1' })
+  friendsAsUser1: Friend[];
+
+  @HasMany(() => Friend, { foreignKey: 'user_mail2', as: 'friendsAsUser2' })
+  friendsAsUser2: Friend[];
 }

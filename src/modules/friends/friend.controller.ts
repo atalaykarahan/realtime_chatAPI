@@ -64,6 +64,7 @@ export class FriendController {
   //#endregion
 
   // api/v1/friend | delete
+  //region REMOVE & DELETE FRIEND
   @UseGuards(ValidSession)
   @Delete()
   async removeFriend(
@@ -87,4 +88,28 @@ export class FriendController {
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   }
+
+  //endregion
+
+  // api/v1/friend/blocked | get
+  //region GET BLOCKED FRIENDS
+  @UseGuards(ValidSession)
+  @Get('blocked')
+  async getBlockedFriends(
+    @Res() res: Response,
+    @Session() session: Record<string, any>,
+  ) {
+    const blockedList = await this.friendService.getAllBlockedFriends(
+      session.user.mail,
+    );
+
+    if (!blockedList)
+      throw new HttpException(
+        'You have not blocked anyone yet.',
+        HttpStatus.NO_CONTENT,
+      );
+
+    return res.status(HttpStatus.OK).json(blockedList);
+  }
+  //endregion
 }
