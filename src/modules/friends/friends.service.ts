@@ -154,7 +154,8 @@ export class FriendsService {
       (f.friend_status = 'block_both')
     OR
     (f.friend_status = 'block_second_first')
-  )`,
+    )
+    AND f."deletedAt" IS NULL`,
       {
         replacements: {
           userEmail: user_mail,
