@@ -69,7 +69,6 @@ export class RoomsService {
     );
     // if roomId exists then create one
     if (!newRoom) {
-      console.log('bu iki kullanıcının beraber olduğu room yok');
       newRoom = await this.createAndAddUsers(user_id1, user2.user_id);
     }
     return newRoom;

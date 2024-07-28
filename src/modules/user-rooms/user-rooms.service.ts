@@ -52,7 +52,6 @@ export class UserRoomsService {
       group: ['UserRoom.room_id', 'room.room_id'],
       having: Sequelize.literal('COUNT(DISTINCT "UserRoom"."user_id") = 2'),
     });
-    console.log('burayı takip et', roomId);
     if (!roomId) return false;
     return roomId.room;
   }
