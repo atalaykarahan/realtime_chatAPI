@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { RoomType } from '../../../enum';
 
 export class RoomDto {
   @IsOptional()
@@ -12,4 +13,8 @@ export class RoomDto {
 
   @IsOptional()
   readonly last_message?: string;
+
+  @IsEnum(RoomType)
+  @IsOptional()
+  readonly room_type?: RoomType = RoomType.private;
 }

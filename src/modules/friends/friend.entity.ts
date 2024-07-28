@@ -14,6 +14,14 @@ import { User } from '../users/user.entity';
 })
 export class Friend extends Model<Friend> {
   @Column({
+    type: DataType.BIGINT,
+    primaryKey: true,
+    allowNull: true,
+    autoIncrement: true,
+  })
+  friend_id: string;
+
+  @Column({
     type: DataType.STRING,
     primaryKey: true,
     allowNull: false,
@@ -35,12 +43,6 @@ export class Friend extends Model<Friend> {
     field: 'friend_status',
   })
   friend_status: FriendStatus;
-
-  // @BelongsTo(() => User, 'user_mail')
-  // user1: User;
-  //
-  // @BelongsTo(() => User, 'user_mail2')
-  // user2: User;
 
   @BelongsTo(() => User, {
     foreignKey: 'user_mail',

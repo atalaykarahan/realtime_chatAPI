@@ -13,3 +13,8 @@ export enum FriendStatus {
   block_first_second = 'block_first_second',
   block_second_first = 'block_second_first',
 }
+
+export enum RoomType {
+  private = 'private',
+  group = 'group',
+}

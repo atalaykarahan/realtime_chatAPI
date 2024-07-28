@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { Room } from '../rooms/room.entity';
 
 @Table({ tableName: 'USER_ROOM' })
 export class UserRoom extends Model<UserRoom> {
@@ -9,10 +17,14 @@ export class UserRoom extends Model<UserRoom> {
   })
   user_id: string;
 
+  @ForeignKey(() => Room)
   @Column({
     type: DataType.UUID,
     primaryKey: true,
     allowNull: true,
   })
   room_id: string;
+
+  @BelongsTo(() => Room)
+  room: Room;
 }

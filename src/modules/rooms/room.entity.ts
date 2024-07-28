@@ -1,4 +1,6 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { FriendStatus, RoomType } from '../../enum';
+import { UserRoom } from '../user-rooms/user-room.entity';
 
 @Table({ tableName: 'ROOM' })
 export class Room extends Model<Room> {
@@ -27,4 +29,16 @@ export class Room extends Model<Room> {
     allowNull: true,
   })
   last_message: string;
+
+  @Column({
+    type: DataType.STRING,
+    values: Object.keys(RoomType),
+    allowNull: false,
+    defaultValue: RoomType.private,
+    field: 'room_type',
+  })
+  room_type: RoomType;
+
+  @HasMany(() => UserRoom)
+  userRooms: UserRoom[];
 }

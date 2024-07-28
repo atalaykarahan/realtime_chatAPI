@@ -19,15 +19,15 @@ export class RoomController {
 
   // api/v1/room | post
   @UseGuards(ValidSession)
-  @Post()
-  async createPrivateRoom(
+  @Post('check')
+  async checkPrivateRoom(
     @Body() body: { friendMail: string },
     @Res() res: Response,
     @Session() session: Record<string, any>,
   ) {
     if (!body.friendMail)
-      throw new HttpException('user_id2 is missing', HttpStatus.BAD_REQUEST);
-    const roomId = await this.roomService.createAndAddUsers(
+      throw new HttpException('friendMail is missing', HttpStatus.BAD_REQUEST);
+    const roomId = await this.roomService.getOrCreatePrivateRoom(
       session.user.id,
       body.friendMail,
     );
