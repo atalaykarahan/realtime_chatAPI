@@ -1,12 +1,13 @@
 import { INestApplicationContext, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { Server, ServerOptions, Socket } from 'socket.io';
+import { Server, ServerOptions } from 'socket.io';
 import { UsersService } from './modules/users/users.service';
 import { sessionMiddleware, wrap } from './modules/server/server.controller';
 
 export class SocketIOAdapter extends IoAdapter {
   private readonly logger = new Logger(SocketIOAdapter.name);
+
   constructor(
     private app: INestApplicationContext,
     private configService: ConfigService,

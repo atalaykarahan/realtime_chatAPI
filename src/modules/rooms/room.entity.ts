@@ -1,5 +1,5 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
-import { FriendStatus, RoomType } from '../../enum';
+import { RoomType } from '../../enum';
 import { UserRoom } from '../user-rooms/user-room.entity';
 
 @Table({ tableName: 'ROOM' })

@@ -1,9 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { MESSAGE_REPOSITORY } from 'src/core/constants';
 import { Message } from './message.entity';
-import { User } from '../users/user.entity';
 import { MessageDto } from './dto/message.dto';
-import { Op } from 'sequelize';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class MessagesService {
@@ -12,9 +15,26 @@ export class MessagesService {
     private readonly messageRepository: typeof Message,
   ) {}
 
-  // async create(message: MessageDto): Promise<Message> {
-  //   return await this.messageRepository.create<Message>(message);
-  // }
+  async create(
+    message: MessageDto,
+    transaction?: Transaction,
+  ): Promise<Message> {
+    try {
+      let newMessage;
+      if (transaction) {
+        newMessage = await this.messageRepository.create<Message>(message, {
+          transaction,
+        });
+      } else {
+        newMessage = await this.messageRepository.create<Message>(message);
+      }
+
+      return newMessage;
+    } catch (e) {
+      throw new InternalServerErrorException(e);
+    }
+  }
+
   //
   // async getPrivateConversation(
   //   sender_id: string,

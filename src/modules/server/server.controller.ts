@@ -17,7 +17,7 @@ redisClient.on('connect', () =>
 
 export const sessionMiddleware = session({
   store: new RedisStore({ client: redisClient as any }),
-  secret: 'asdfasdgasdfas',
+  secret: 'wubbalubbadubdub',
   resave: false,
   saveUninitialized: false,
   name: process.env.COOKIE_NAME,

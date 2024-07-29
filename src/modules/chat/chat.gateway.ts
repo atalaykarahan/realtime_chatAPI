@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -10,6 +10,10 @@ import {
 import { Namespace, Socket } from 'socket.io';
 import { MessageDto } from '../messages/dto/message.dto';
 import { MessagesService } from '../messages/messages.service';
+import { RoomsService } from '../rooms/rooms.service';
+import { SEQUELIZE } from '../../core/constants';
+import { Sequelize } from 'sequelize-typescript';
+import { from } from 'rxjs';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -19,7 +23,13 @@ export class ChatGateway
 {
   private readonly logger = new Logger(ChatGateway.name);
   private userSockets = new Map<string, string>();
-  constructor(private readonly messageService: MessagesService) {}
+
+  constructor(
+    private readonly messageService: MessagesService,
+    private readonly roomService: RoomsService,
+    @Inject(SEQUELIZE)
+    private readonly sequelize: Sequelize,
+  ) {}
 
   @WebSocketServer() io: Namespace;
 
@@ -55,45 +65,51 @@ export class ChatGateway
     // );
   }
 
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(client: any, roomId: string) {
+    client.join(roomId);
+    this.logger.debug(`Client ${client.id} joined room ${roomId}`);
+  }
+
   @SubscribeMessage('sendMessage')
   async handleMessage(
     client: any,
-    payload: { DestionationUserId: string; message: string },
+    payload: { room_id: string; message: string },
   ) {
-    const { DestionationUserId, message } = payload;
-    //socket id user_id ile aynı sey degil
-    const destinationSocketId = this.userSockets.get(DestionationUserId);
-
-    if (destinationSocketId) {
+    const { room_id, message } = payload;
+    if (room_id && message) {
+      const transaction = await this.sequelize.transaction();
       try {
-        //insert kodu buraya gelecek
         const messageObj: MessageDto = {
-          message_content: message,
-          message_sender_id: client.user_id,
-          message_receiver_id: DestionationUserId,
-          message_read_status: 'unread',
+          room_id: room_id,
+          message: message,
+          sender_id: client.user_id,
         };
+        const createdMessage = await this.messageService.create(
+          messageObj,
+          transaction,
+        );
+        const destinationRoom = await this.roomService.getByPk(room_id);
+        destinationRoom.last_message = message;
+        await destinationRoom.save({ transaction });
+        await transaction.commit();
 
-        // const createdMessage = this.messageService.create(messageObj);
+        if (createdMessage) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { room_id, deletedAt, message_id, ...result } =
+            createdMessage['dataValues'];
+          // this.io.to(chat_list).emit('alper_id', result);
+          this.io.emit(room_id, result);
+          // this.io.emit(genel_id, 'herekese merhaba');
 
-        // if (createdMessage) {
-        //   this.io.to(destinationSocketId).emit('chat', {
-        //     sender_id: client.user_id,
-        //     message: message,
-        //   });
-        //
-        //   console.log(
-        //     'Mesaj başarıyla gönderildi ve veritabanına eklendi.',
-        //     createdMessage,
-        //   );
-        // } else {
-        //   console.error('Mesaj veritabanına eklenemedi.');
-        // }
-      } catch (error) {
-        console.error('Mesaj veritabanına eklenirken bir hata oluştu:', error);
+          //chat list için
+          //this.io.emit(chat_list, alperin, {şunadn bundan son mesaj bu bu geldi});
+          //this.io.to('friend_notification').emit('alper_id', {kimden falan filan})
+        }
+      } catch (e) {
+        await transaction.rollback();
+        console.error('Mesaj veritabanına eklenirken bir hata oluştu  ', e);
       }
-    } else {
-      this.logger.warn(`User with id: ${DestionationUserId} is not connected.`);
     }
   }
 }

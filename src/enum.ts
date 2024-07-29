@@ -1,6 +1,3 @@
-export const READ_STATUS = ['unread', 'readed'] as const;
-export type ReadStatus = (typeof READ_STATUS)[number];
-
 export enum RequestStatus {
   pending = 'pending',
   rejected = 'rejected',
@@ -17,4 +14,9 @@ export enum FriendStatus {
 export enum RoomType {
   private = 'private',
   group = 'group',
+}
+
+export enum ReadStatus {
+  unread = 'unread',
+  readed = 'readed',
 }

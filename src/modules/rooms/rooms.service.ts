@@ -73,4 +73,8 @@ export class RoomsService {
     }
     return newRoom;
   }
+
+  async getByPk(room_id: string): Promise<Room> {
+    return await this.roomRepository.findByPk(room_id);
+  }
 }

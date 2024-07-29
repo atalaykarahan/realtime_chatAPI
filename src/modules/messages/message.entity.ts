@@ -1,45 +1,39 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
-import { READ_STATUS, ReadStatus } from 'src/enum';
-import { User } from '../users/user.entity';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { ReadStatus } from 'src/enum';
 
 @Table({ tableName: 'MESSAGE' })
 export class Message extends Model<Message> {
   @Column({
-    type: DataType.BIGINT,
-    autoIncrement: true,
+    type: DataType.UUID,
     primaryKey: true,
+    allowNull: true,
+    autoIncrement: true,
   })
   message_id: string;
 
   @Column({
+    type: DataType.UUID,
+  })
+  room_id: string;
+
+  @Column({
     type: DataType.STRING,
+    values: Object.keys(ReadStatus),
+    allowNull: false,
+    defaultValue: ReadStatus.unread,
+    field: 'message_status',
+  })
+  message_status: ReadStatus;
+
+  @Column({
+    type: DataType.TEXT,
     allowNull: false,
   })
-  message_content: string;
+  message: string;
 
-  @ForeignKey(() => User)
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  message_sender_id: string;
-
-  @ForeignKey(() => User)
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  message_receiver_id: string;
-
-  @Column({
-    type: DataType.ENUM(...READ_STATUS),
-    allowNull: false,
-  })
-  message_read_status: ReadStatus;
-
-  @BelongsTo(() => User, 'message_sender_id')
-  sender: User;
-
-  @BelongsTo(() => User, 'message_receiver_id')
-  receiver: User;
+  sender_id: string;
 }

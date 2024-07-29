@@ -37,13 +37,6 @@ export class User extends Model<User> {
     defaultValue: 'standard',
   })
   user_role: string;
-
-  @HasMany(() => Message, 'message_sender_id')
-  sentMessages: Message[];
-
-  @HasMany(() => Message, 'message_receiver_id')
-  receivedMessages: Message[];
-
   // @HasMany(() => Friend, 'user_mail')
   // friends1: Friend[];
   //
