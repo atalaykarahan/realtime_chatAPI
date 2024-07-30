@@ -15,6 +15,7 @@ export class MessagesService {
     private readonly messageRepository: typeof Message,
   ) {}
 
+  //region CREATE MESSAGE
   async create(
     message: MessageDto,
     transaction?: Transaction,
@@ -34,6 +35,18 @@ export class MessagesService {
       throw new InternalServerErrorException(e);
     }
   }
+  //endregion
+
+  //region GET MESSAGE HISTORY BY ROOM ID
+  async getHistoryByRoomId(room_id: string): Promise<Message[]> {
+    const messages = await Message.findAll({
+      where: { room_id },
+      order: [['createdAt', 'ASC']],
+    });
+
+    return messages;
+  }
+  //endregion
 
   //
   // async getPrivateConversation(
