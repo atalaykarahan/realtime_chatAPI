@@ -3,16 +3,19 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { MESSAGE_REPOSITORY } from 'src/core/constants';
+import { MESSAGE_REPOSITORY, SEQUELIZE } from 'src/core/constants';
 import { Message } from './message.entity';
 import { MessageDto } from './dto/message.dto';
-import { Transaction } from 'sequelize';
+import sequelize, { Transaction } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class MessagesService {
   constructor(
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: typeof Message,
+    @Inject(SEQUELIZE)
+    private readonly sequelize: Sequelize,
   ) {}
 
   //region CREATE MESSAGE
@@ -35,6 +38,7 @@ export class MessagesService {
       throw new InternalServerErrorException(e);
     }
   }
+
   //endregion
 
   //region GET MESSAGE HISTORY BY ROOM ID
@@ -46,7 +50,24 @@ export class MessagesService {
 
     return messages;
   }
+
   //endregion
+
+  async getChatHistoryByUserId(user_id: string): Promise<any> {
+    const chatList = await this.sequelize.query(
+      `SELECT r.room_id, r.last_message, r."updatedAt", u.user_name, u.user_email, u.user_photo FROM "USER_ROOM" ur
+    INNER JOIN "ROOM" r ON r.room_id = ur.room_id
+    LEFT JOIN "USER_ROOM" ur2 ON ur2.room_id = r.room_id
+    LEFT JOIN "USER" u ON u.user_id = ur2.user_id
+    WHERE ur.user_id = :userId
+    AND ur2.user_id != :userId
+    AND r."deletedAt" IS NULL
+    ORDER BY r."updatedAt" desc`,
+      { replacements: { userId: user_id }, type: sequelize.QueryTypes.SELECT },
+    );
+
+    return chatList;
+  }
 
   //
   // async getPrivateConversation(

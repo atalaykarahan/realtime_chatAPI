@@ -74,7 +74,7 @@ export class FriendController {
   ) {
     if (!body.friend_mail)
       throw new HttpException('Friend mail is missing', HttpStatus.BAD_REQUEST);
-
+    console.log('buraya düştü');
     const removeFriend = await this.friendService.delete({
       user_mail: session.user.mail,
       user_mail2: body.friend_mail,
@@ -111,5 +111,6 @@ export class FriendController {
 
     return res.status(HttpStatus.OK).json(blockedList);
   }
+
   //endregion
 }

@@ -96,7 +96,7 @@ export class ChatGateway
 
         if (createdMessage) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { room_id, deletedAt, message_id, ...result } =
+          const { room_id, deletedAt, ...result } =
             createdMessage['dataValues'];
           // this.io.to(chat_list).emit('alper_id', result);
           this.io.emit(room_id, result);
