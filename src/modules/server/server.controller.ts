@@ -1,19 +1,5 @@
-import { Logger } from '@nestjs/common';
 import * as session from 'express-session';
-import { default as Redis } from 'ioredis';
-
-const RedisStore = require('connect-redis').default;
-const redisClient = new Redis({
-  host: '127.0.0.1',
-  port: 6379,
-});
-
-redisClient.on('error', (err) =>
-  Logger.error('Could not establish a connection with redis. ' + err),
-);
-redisClient.on('connect', () =>
-  Logger.verbose('Connected to redis successfully'),
-);
+import { redisClient, RedisStore } from '../redis/redis.service';
 
 export const sessionMiddleware = session({
   store: new RedisStore({ client: redisClient as any }),

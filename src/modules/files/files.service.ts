@@ -1,18 +1,18 @@
-import { Body, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { FILE_REPOSITORY, SEQUELIZE } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { ConfigService } from '@nestjs/config';
 import {
-  CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
   PutObjectCommand,
   S3Client,
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Injectable()
 export class FilesService {
-  private readonly s3Client = new S3Client({
+  public s3Client = new S3Client({
     region: this.configService.getOrThrow('AWS_S3_REGION'),
   });
 
@@ -24,74 +24,49 @@ export class FilesService {
     private readonly configService: ConfigService,
   ) {}
 
-  async upload(fileName: string, file: Buffer, fileSize: number) {
+  async upload(fileName: string, file: Buffer) {
     try {
-      if (fileSize <= 314572800) {
-        await this.s3Client.send(
-          new PutObjectCommand({
-            Bucket: 'realtime-chat-test',
-            Key: fileName,
-            Body: file,
-          }),
-        );
-      } else {
-        const uploadId = await this.createMultipartUpload(fileName);
-        const parts = await this.uploadParts(file, uploadId, fileName);
-        console.log('bu upload id', uploadId);
-        console.log('burasıda part', parts);
-        await this.completeMultipartUpload(uploadId, fileName, parts);
-      }
+      await this.s3Client.send(
+        new PutObjectCommand({
+          Bucket: 'realtime-chat-test',
+          Key: fileName,
+          Body: file,
+        }),
+      );
     } catch (e) {
       console.error('s3 aktarımında hata', e);
     }
   }
 
-  private async createMultipartUpload(fileName: string) {
-    const command = new CreateMultipartUploadCommand({
+  async initializeMultipartUpload(fileName: string, fileType: string) {
+    const params = {
       Bucket: 'realtime-chat-test',
       Key: fileName,
-    });
+      ContentType: fileType,
+    };
 
-    const { UploadId } = await this.s3Client.send(command);
-    return UploadId;
+    const command = new CreateMultipartUploadCommand(params);
+    const upload = await this.s3Client.send(command);
+    return upload.UploadId;
   }
 
-  private async uploadParts(file: Buffer, uploadId: string, fileName: string) {
-    const partSize = 5 * 1024 * 1024; // 5 MB
-    const numParts = Math.ceil(file.length / partSize);
-    const parts = [];
+  async getPresignedUrls(uploadId: string, fileName: string, fileSize: number) {
+    const partCount = 6; // Her zaman 6 parçaya böleceğiz
+    const chunkSize = Math.ceil(fileSize / partCount); // Dinamik olarak chunk boyutunu belirle
 
-    for (let partNumber = 1; partNumber <= numParts; partNumber++) {
-      const start = (partNumber - 1) * partSize;
-      const end = Math.min(file.length, partNumber * partSize);
-      const partData = file.slice(start, end);
+    const urls = [];
+    for (let i = 1; i <= partCount; i++) {
       const command = new UploadPartCommand({
         Bucket: 'realtime-chat-test',
         Key: fileName,
-        PartNumber: partNumber,
+        PartNumber: i,
         UploadId: uploadId,
-        Body: partData,
       });
-
-      const { ETag } = await this.s3Client.send(command);
-      parts.push({ ETag, PartNumber: partNumber });
+      const url = await getSignedUrl(this.s3Client, command, {
+        expiresIn: 3600,
+      });
+      urls.push({ partNumber: i, url, chunkSize }); // chunkSize'ı da döndürüyoruz
     }
-
-    return parts;
-  }
-
-  private async completeMultipartUpload(
-    uploadId: string,
-    fileName: string,
-    parts: { ETag: string; PartNumber: number }[],
-  ) {
-    const command = new CompleteMultipartUploadCommand({
-      Bucket: 'realtime-chat-test',
-      Key: fileName,
-      UploadId: uploadId,
-      MultipartUpload: { Parts: parts },
-    });
-
-    await this.s3Client.send(command);
+    return urls;
   }
 }
