@@ -66,8 +66,6 @@ export class FileController {
       fileSize,
     );
 
-    c;
-
     return res.status(HttpStatus.OK).json({ uploadId, presignedUrls });
   }
 
